@@ -147,455 +147,428 @@
               <select id="edit-item-modal-type" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5"></select>
             </div>
             <div class="flex justify-end gap-2">
-            // عناصر واجهة الاقتراحات
-            const addSuggestionForm = document.getElementById('add-suggestion-form');
-            const suggestionNameInput = document.getElementById('suggestion-name');
-            const suggestionTypeSelect = document.getElementById('suggestion-type');
-            const selectSuggestionGroupDropdown = document.getElementById('select-suggestion-group');
-            const addSuggestionBtn = document.getElementById('add-suggestion-btn');
-            const suggestionsContainer = document.getElementById('suggestions-container');
-            // عناصر المودال لاختيار المجموعة عند النقل
-            const modal = document.getElementById('group-select-modal');
-            const modalSelect = document.getElementById('group-select-modal-select');
-            const modalOk = document.getElementById('group-select-modal-ok');
-            const modalCancel = document.getElementById('group-select-modal-cancel');
-            let moveContext = null;
+                <button id="edit-item-modal-cancel" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">إلغاء</button>
+                <button id="edit-item-modal-ok" class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">موافق</button>
+            </div>
+          </div>
+        </div>
+    </div>
 
-            const statusConfig = {
-                'excellent': { text: 'ممتاز', color: 'bg-green-500', textColor: 'text-green-800', bgColor: 'bg-green-100' },
-                'good': { text: 'جيد', color: 'bg-blue-500', textColor: 'text-blue-800', bgColor: 'bg-blue-100' },
-                'bad': { text: 'سيء', color: 'bg-yellow-500', textColor: 'text-yellow-800', bgColor: 'bg-yellow-100' },
-                'not-working': { text: 'لا تعمل', color: 'bg-red-500', textColor: 'text-red-800', bgColor: 'bg-red-100' }
-            };
+    <script>
+        // عناصر واجهة الميزات
+        const addFeatureForm = document.getElementById('add-feature-form');
+        const featureNameInput = document.getElementById('feature-name');
+        const featureStatusSelect = document.getElementById('feature-status');
+        const selectGroupDropdown = document.getElementById('select-group');
+        const addFeatureBtn = document.getElementById('add-feature-btn');
+        const featuresContainer = document.getElementById('features-container');
+        const addGroupForm = document.getElementById('add-group-form');
+        const groupNameInput = document.getElementById('group-name');
 
-            let featureGroups = {};
-            let suggestedFeatures = {};
+        // عناصر واجهة الاقتراحات
+        const addSuggestionForm = document.getElementById('add-suggestion-form');
+        const suggestionNameInput = document.getElementById('suggestion-name');
+        const suggestionTypeSelect = document.getElementById('suggestion-type');
+        const selectSuggestionGroupDropdown = document.getElementById('select-suggestion-group');
+        const addSuggestionBtn = document.getElementById('add-suggestion-btn');
+        const suggestionsContainer = document.getElementById('suggestions-container');
 
-            let db;
-            const request = indexedDB.open('FeatureTrackerDB', 1);
+        // عناصر المودال لاختيار المجموعة عند النقل
+        const modal = document.getElementById('group-select-modal');
+        const modalSelect = document.getElementById('group-select-modal-select');
+        const modalOk = document.getElementById('group-select-modal-ok');
+        const modalCancel = document.getElementById('group-select-modal-cancel');
+        let moveContext = null;
 
-            request.onupgradeneeded = function(event) {
-                db = event.target.result;
-                if (!db.objectStoreNames.contains('featureStore')) {
-                    db.createObjectStore('featureStore');
-                }
-            };
+        // عناصر مودال التعديل
+        const editModal = document.getElementById('edit-item-modal');
+        const editModalTitle = document.getElementById('edit-item-modal-title');
+        const editModalNameInput = document.getElementById('edit-item-modal-name');
+        const editModalTypeLabel = document.getElementById('edit-item-modal-type-label');
+        const editModalTypeSelect = document.getElementById('edit-item-modal-type');
+        const editModalOkBtn = document.getElementById('edit-item-modal-ok');
+        const editModalCancelBtn = document.getElementById('edit-item-modal-cancel');
+        let editContext = null;
 
-            request.onsuccess = function(event) {
-                db = event.target.result;
-                loadData().then(() => {
-                    renderUI();
-                });
-            };
+        const statusConfig = {
+            'excellent': { text: 'ممتاز', color: 'bg-green-500', textColor: 'text-green-800', bgColor: 'bg-green-100' },
+            'good': { text: 'جيد', color: 'bg-blue-500', textColor: 'text-blue-800', bgColor: 'bg-blue-100' },
+            'bad': { text: 'سيء', color: 'bg-yellow-500', textColor: 'text-yellow-800', bgColor: 'bg-yellow-100' },
+            'not-working': { text: 'لا تعمل', color: 'bg-red-500', textColor: 'text-red-800', bgColor: 'bg-red-100' }
+        };
 
-            request.onerror = function(event) {
-                console.error('IndexedDB error:', event.target.errorCode);
-                featureGroups = {};
-                suggestedFeatures = {};
+        let featureGroups = {};
+        let suggestedFeatures = {};
+
+        let db;
+        const request = indexedDB.open('FeatureTrackerDB', 1);
+
+        request.onupgradeneeded = function(event) {
+            db = event.target.result;
+            if (!db.objectStoreNames.contains('featureStore')) {
+                db.createObjectStore('featureStore');
+            }
+        };
+
+        request.onsuccess = function(event) {
+            db = event.target.result;
+            loadData().then(() => {
                 renderUI();
-            };
+            });
+        };
 
-            // تحميل البيانات
-            function loadData() {
-                return new Promise((resolve) => {
-                    const tx = db.transaction('featureStore', 'readonly');
-                    const store = tx.objectStore('featureStore');
-                    const getReq = store.get('featureTrackerData');
-                    getReq.onsuccess = function() {
-                        const data = getReq.result || {};
-                        if (data.featureGroups) {
-                            featureGroups = data.featureGroups;
-                            suggestedFeatures = data.suggestedFeatures || {};
-                        } else {
-                            featureGroups = data;
-                            suggestedFeatures = {};
-                        }
-                        resolve();
-                    };
-                    getReq.onerror = function() {
-                        featureGroups = {};
-                        suggestedFeatures = {};
-                        resolve();
-                    };
-                });
-            }
+        request.onerror = function(event) {
+            console.error('IndexedDB error:', event.target.errorCode);
+            featureGroups = {};
+            suggestedFeatures = {};
+            renderUI();
+        };
 
-            // حفظ البيانات
-            function saveData() {
-                const tx = db.transaction('featureStore', 'readwrite');
+        // تحميل البيانات
+        function loadData() {
+            return new Promise((resolve) => {
+                const tx = db.transaction('featureStore', 'readonly');
                 const store = tx.objectStore('featureStore');
-                store.put({ featureGroups, suggestedFeatures }, 'featureTrackerData');
-            }
+                const getReq = store.get('featureTrackerData');
+                getReq.onsuccess = function() {
+                    const data = getReq.result || {};
+                    if (data.featureGroups) {
+                        featureGroups = data.featureGroups;
+                        suggestedFeatures = data.suggestedFeatures || {};
+                    } else {
+                        featureGroups = data;
+                        suggestedFeatures = {};
+                    }
+                    resolve();
+                };
+                getReq.onerror = function() {
+                    featureGroups = {};
+                    suggestedFeatures = {};
+                    resolve();
+                };
+            });
+        }
 
-            /**
-             * دالة لتحديث القائمة المنسدلة للمجموعات وحالة نموذج إضافة الميزات
-             */
-            function renderGroupSelector() {
-                const lastSelectedGroup = selectGroupDropdown.value;
-                selectGroupDropdown.innerHTML = '';
-                const groupKeys = Object.keys(featureGroups);
+        // حفظ البيانات
+        function saveData() {
+            const tx = db.transaction('featureStore', 'readwrite');
+            const store = tx.objectStore('featureStore');
+            store.put({ featureGroups, suggestedFeatures }, 'featureTrackerData');
+        }
 
-                if (groupKeys.length === 0) {
-                    selectGroupDropdown.disabled = true;
-                    featureNameInput.disabled = true;
-                    featureStatusSelect.disabled = true;
-                    addFeatureBtn.disabled = true;
+        /**
+         * دالة لتحديث القائمة المنسدلة للمجموعات وحالة نموذج إضافة الميزات
+         */
+        function renderGroupSelector() {
+            const lastSelectedGroup = selectGroupDropdown.value;
+            selectGroupDropdown.innerHTML = '';
+            const groupKeys = Object.keys(featureGroups);
+
+            if (groupKeys.length === 0) {
+                selectGroupDropdown.disabled = true;
+                featureNameInput.disabled = true;
+                featureStatusSelect.disabled = true;
+                addFeatureBtn.disabled = true;
+                const option = document.createElement('option');
+                option.textContent = 'أنشئ مجموعة أولاً';
+                selectGroupDropdown.appendChild(option);
+            } else {
+                selectGroupDropdown.disabled = false;
+                featureNameInput.disabled = false;
+                featureStatusSelect.disabled = false;
+                addFeatureBtn.disabled = false;
+                groupKeys.forEach(groupName => {
                     const option = document.createElement('option');
-                    option.textContent = 'أنشئ مجموعة أولاً';
+                    option.value = groupName;
+                    option.textContent = groupName;
                     selectGroupDropdown.appendChild(option);
-                } else {
-                    selectGroupDropdown.disabled = false;
-                    featureNameInput.disabled = false;
-                    featureStatusSelect.disabled = false;
-                    addFeatureBtn.disabled = false;
-                    groupKeys.forEach(groupName => {
-                        const option = document.createElement('option');
-                        option.value = groupName;
-                        option.textContent = groupName;
-                        selectGroupDropdown.appendChild(option);
-                    });
-                    // إعادة تحديد المجموعة التي كانت محددة سابقاً إن وجدت
-                    if (groupKeys.includes(lastSelectedGroup)) {
-                        selectGroupDropdown.value = lastSelectedGroup;
-                    }
+                });
+                // إعادة تحديد المجموعة التي كانت محددة سابقاً إن وجدت
+                if (groupKeys.includes(lastSelectedGroup)) {
+                    selectGroupDropdown.value = lastSelectedGroup;
                 }
             }
+        }
 
-            /**
-             * دالة لتحديث القائمة المنسدلة للمجموعات وحالة نموذج إضافة الاقتراحات
-             */
-            function renderSuggestionGroupSelector() {
-                if (!selectSuggestionGroupDropdown) return;
-                const last = selectSuggestionGroupDropdown.value || '';
-                selectSuggestionGroupDropdown.innerHTML = '';
-                const keys = Object.keys(featureGroups);
-                if (keys.length === 0) {
-                    selectSuggestionGroupDropdown.disabled = true;
-                    suggestionNameInput.disabled = true;
-                    suggestionTypeSelect.disabled = true;
-                    addSuggestionBtn.disabled = true;
-                    const opt = document.createElement('option'); opt.textContent = 'أنشئ مجموعة أولاً';
-                    selectSuggestionGroupDropdown.appendChild(opt);
-                } else {
-                    selectSuggestionGroupDropdown.disabled = false;
-                    suggestionNameInput.disabled = false;
-                    suggestionTypeSelect.disabled = false;
-                    addSuggestionBtn.disabled = false;
-                    keys.forEach(name => { const o = document.createElement('option'); o.value = name; o.textContent = name; selectSuggestionGroupDropdown.appendChild(o); });
-                    if (keys.includes(last)) selectSuggestionGroupDropdown.value = last;
-                }
+        /**
+         * دالة لتحديث القائمة المنسدلة للمجموعات وحالة نموذج إضافة الاقتراحات
+         */
+        function renderSuggestionGroupSelector() {
+            if (!selectSuggestionGroupDropdown) return;
+            const last = selectSuggestionGroupDropdown.value || '';
+            selectSuggestionGroupDropdown.innerHTML = '';
+            const keys = Object.keys(featureGroups);
+            if (keys.length === 0) {
+                selectSuggestionGroupDropdown.disabled = true;
+                suggestionNameInput.disabled = true;
+                suggestionTypeSelect.disabled = true;
+                addSuggestionBtn.disabled = true;
+                const opt = document.createElement('option'); opt.textContent = 'أنشئ مجموعة أولاً';
+                selectSuggestionGroupDropdown.appendChild(opt);
+            } else {
+                selectSuggestionGroupDropdown.disabled = false;
+                suggestionNameInput.disabled = false;
+                suggestionTypeSelect.disabled = false;
+                addSuggestionBtn.disabled = false;
+                keys.forEach(name => { const o = document.createElement('option'); o.value = name; o.textContent = name; selectSuggestionGroupDropdown.appendChild(o); });
+                if (keys.includes(last)) selectSuggestionGroupDropdown.value = last;
             }
+        }
 
-            /**
-             * دالة لرسم بطاقات المجموعات والميزات
-             */
-            function renderFeatureCards() {
-                featuresContainer.innerHTML = '';
+        /**
+         * دالة لرسم بطاقات المجموعات والميزات
+         */
+        function renderFeatureCards() {
+            featuresContainer.innerHTML = '';
 
-                if (Object.keys(featureGroups).length === 0) {
-                    featuresContainer.innerHTML = `
-                        <div class="text-center bg-white p-10 rounded-2xl shadow-md">
-                            <h3 class="text-xl font-semibold text-slate-700">لم تقم بإضافة أي مجموعات بعد</h3>
-                            <p class="text-slate-500 mt-2">استخدم نموذج "إنشاء مجموعة" في الأعلى للبدء.</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                for (const groupName in featureGroups) {
-                    const group = featureGroups[groupName];
-                    const groupElement = document.createElement('div');
-                    groupElement.className = 'bg-white p-6 rounded-2xl shadow-lg';
-
-                    const groupHeader = `
-                        <div class="flex justify-between items-center mb-4 border-b pb-3">
-                            <h3 class="text-xl font-bold text-slate-800">${groupName}</h3>
-                            <button class="delete-group-btn text-slate-400 hover:text-red-600 transition" data-group="${groupName}" title="حذف المجموعة">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                            </button>
-                        </div>
-                    `;
-                    
-                    const featuresList = document.createElement('div');
-                    featuresList.className = 'space-y-3';
-
-                    if (group.length > 0) {
-                        group.forEach((feature, index) => {
-                            const config = statusConfig[feature.status];
-                            const featureElement = document.createElement('div');
-                            featureElement.className = `flex items-center justify-between p-3 rounded-lg ${config.bgColor}`;
-                            
-                            featureElement.innerHTML = `
-                                                <div class="flex items-center gap-3">
-                                                        <span class="status-dot ${config.color}"></span>
-                                                        <p class="font-medium text-slate-700">${feature.name}</p>
-                                                    </div>
-                                                    <div class="flex items-center gap-3">
-                                                        <span class="text-sm font-semibold ${config.textColor} px-2 py-1 rounded-full">${config.text}</span>
-                                                        <button class="move-feature-btn text-slate-400 hover:text-blue-600 transition" data-group="${groupName}" data-index="${index}" title="نقل الميزة">↔</button>
-                                                        <button class="edit-feature-btn text-slate-400 hover:text-yellow-600 transition" data-group="${groupName}" data-index="${index}" title="تعديل الميزة">✎</button>
-                                                        <button class="delete-feature-btn text-slate-400 hover:text-red-600 transition" data-group="${groupName}" data-index="${index}" title="حذف الميزة">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                                    </button>
-                                </div>
-                            `;
-                            featuresList.appendChild(featureElement);
-                        });
-                    } else {
-                        featuresList.innerHTML = `<p class="text-slate-500 text-center p-4">لا توجد ميزات في هذه المجموعة بعد.</p>`;
-                    }
-                    
-                    groupElement.innerHTML = groupHeader;
-                    groupElement.appendChild(featuresList);
-                    featuresContainer.appendChild(groupElement);
-                }
-            }
-
-            /**
-             * دالة لرسم بطاقات الاقتراحات
-             */
-            function renderSuggestionCards() {
-                suggestionsContainer.innerHTML = '';
-                if (Object.keys(suggestedFeatures).length === 0) {
-                    suggestionsContainer.innerHTML = `
-                        <div class="text-center bg-white p-10 rounded-2xl shadow-md">
-                            <h3 class="text-xl font-semibold text-slate-700">لم تقم بإضافة أي اقتراحات بعد</h3>
-                        </div>`;
-                    return;
-                }
-                for (const grp in suggestedFeatures) {
-                    const arr = suggestedFeatures[grp];
-                    const el = document.createElement('div'); el.className = 'bg-white p-6 rounded-2xl shadow-lg';
-                    el.innerHTML = `
-                        <div class="flex justify-between items-center mb-4 border-b pb-3">
-                            <h3 class="text-xl font-bold text-slate-800">${grp} - اقتراحات</h3>
-                        </div>`;
-                    const list = document.createElement('div'); list.className = 'space-y-3';
-                    if (arr.length > 0) {
-                        arr.forEach((s, index) => {
-                            const color = s.type === 'necessary' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800';
-                            const text = s.type === 'necessary' ? 'ضرورية' : 'مستقبلية';
-                            const item = document.createElement('div');
-                            item.className = `flex items-center justify-between p-3 rounded-lg ${color}`;
-                            item.innerHTML = `
-                                <p class="font-medium text-slate-700">${s.name}</p>
-                                <div class="flex items-center gap-3">
-                                    <span class="text-sm font-semibold ${s.type==='necessary'?'text-red-800':'text-gray-800'} px-2 py-1 rounded-full">${text}</span>
-                                    <button class="move-suggestion-btn text-slate-400 hover:text-blue-600 transition" data-group="${grp}" data-index="${index}" title="نقل الاقتراح">↔</button>
-                                    <button class="edit-suggestion-btn text-slate-400 hover:text-yellow-600 transition" data-group="${grp}" data-index="${index}" title="تعديل الاقتراح">✎</button>
-                                </div>
-                            `;
-                            list.appendChild(item);
-                        });
-                    } else {
-                        list.innerHTML = `<p class="text-slate-500 text-center p-4">لا توجد اقتراحات في هذه المجموعة بعد.</p>`;
-                    }
-                    el.appendChild(list);
-                    suggestionsContainer.appendChild(el);
-                }
-            }
-
-            // Add function to render feature status counts
-            function renderFeatureCounts() {
-                const counts = { 'excellent': 0, 'good': 0, 'bad': 0, 'not-working': 0 };
-                for (const group of Object.values(featureGroups)) {
-                    group.forEach(f => {
-                        if (counts.hasOwnProperty(f.status)) {
-                            counts[f.status]++;
-                        }
-                    });
-                }
-                const countsContainer = document.getElementById('feature-counts');
-                countsContainer.innerHTML = Object.entries(counts).map(([status, count]) => {
-                    const cfg = statusConfig[status];
-                    return `<div class="flex items-center gap-2"><span class="status-dot ${cfg.color}"></span><span class="font-medium text-slate-700">${cfg.text}: ${count}</span></div>`;
-                }).join('');
-            }
-
-            // Add function to render total suggestion count
-            function renderSuggestionCounts() {
-                let totalSuggestions = 0;
-                Object.values(suggestedFeatures).forEach(arr => { totalSuggestions += arr.length; });
-                const suggContainer = document.getElementById('suggestion-counts');
-                suggContainer.innerHTML = `<div class="font-medium text-slate-700">الاقتراحات: ${totalSuggestions}</div>`;
-            }
-
-            /**
-             * دالة رئيسية لإعادة رسم الواجهة بالكامل
-             */
-            function renderUI() {
-                // Render counts at top
-                renderFeatureCounts();
-                renderSuggestionCounts();
-                renderGroupSelector();
-                renderSuggestionGroupSelector();
-                renderFeatureCards();
-                renderSuggestionCards();
+            if (Object.keys(featureGroups).length === 0) {
+                featuresContainer.innerHTML = `
+                    <div class="text-center bg-white p-10 rounded-2xl shadow-md">
+                        <h3 class="text-xl font-semibold text-slate-700">لم تقم بإضافة أي مجموعات بعد</h3>
+                        <p class="text-slate-500 mt-2">استخدم نموذج "إنشاء مجموعة" في الأعلى للبدء.</p>
+                    </div>
+                `;
+                return;
             }
             
-            addGroupForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const newGroupName = groupNameInput.value.trim();
-                if (newGroupName && !featureGroups[newGroupName]) {
-                    featureGroups[newGroupName] = [];
-                    saveData();
-                    renderUI();
-                    // تحديد المجموعة الجديدة في القائمة المنسدلة
-                    selectGroupDropdown.value = newGroupName;
-                    groupNameInput.value = '';
-                } else if (featureGroups[newGroupName]) {
-                    alert('هذه المجموعة موجودة بالفعل!');
-                }
-            });
+            for (const groupName in featureGroups) {
+                const group = featureGroups[groupName];
+                const groupElement = document.createElement('div');
+                groupElement.className = 'bg-white p-6 rounded-2xl shadow-lg';
 
-            addFeatureForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const featureName = featureNameInput.value.trim();
-                const featureStatus = featureStatusSelect.value;
-                const targetGroup = selectGroupDropdown.value;
+                const groupHeader = `
+                    <div class="flex justify-between items-center mb-4 border-b pb-3">
+                        <h3 class="text-xl font-bold text-slate-800">${groupName}</h3>
+                        <button class="delete-group-btn text-slate-400 hover:text-red-600 transition" data-group="${groupName}" title="حذف المجموعة">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                    </div>
+                `;
                 
-                if (!targetGroup) {
-                    alert('يجب عليك اختيار مجموعة أولاً!');
-                    return;
+                const featuresList = document.createElement('div');
+                featuresList.className = 'space-y-3';
+
+                if (group.length > 0) {
+                    group.forEach((feature, index) => {
+                        const config = statusConfig[feature.status];
+                        const featureElement = document.createElement('div');
+                        featureElement.className = `flex items-center justify-between p-3 rounded-lg ${config.bgColor}`;
+                        
+                        featureElement.innerHTML = `
+                                            <div class="flex items-center gap-3">
+                                                    <span class="status-dot ${config.color}"></span>
+                                                    <p class="font-medium text-slate-700">${feature.name}</p>
+                                                </div>
+                                                <div class="flex items-center gap-3">
+                                                    <span class="text-sm font-semibold ${config.textColor} px-2 py-1 rounded-full">${config.text}</span>
+                                                    <button class="move-feature-btn text-slate-400 hover:text-blue-600 transition" data-group="${groupName}" data-index="${index}" title="نقل الميزة">↔</button>
+                                                    <button class="edit-feature-btn text-slate-400 hover:text-yellow-600 transition" data-group="${groupName}" data-index="${index}" title="تعديل الميزة">✎</button>
+                                                    <button class="delete-feature-btn text-slate-400 hover:text-red-600 transition" data-group="${groupName}" data-index="${index}" title="حذف الميزة">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
+                            </div>
+                        `;
+                        featuresList.appendChild(featureElement);
+                    });
+                } else {
+                    featuresList.innerHTML = `<p class="text-slate-500 text-center p-4">لا توجد ميزات في هذه المجموعة بعد.</p>`;
                 }
                 
-                if (featureName) {
-                    featureGroups[targetGroup].push({ name: featureName, status: featureStatus });
-                    saveData();
-                    renderUI();
-                    featureNameInput.value = '';
-                }
-            });
+                groupElement.innerHTML = groupHeader;
+                groupElement.appendChild(featuresList);
+                featuresContainer.appendChild(groupElement);
+            }
+        }
 
-            // حدث إرسال نموذج الاقتراح
-            addSuggestionForm.addEventListener('submit', e => {
-                e.preventDefault();
-                const name = suggestionNameInput.value.trim();
-                const type = suggestionTypeSelect.value;
-                const grp = selectSuggestionGroupDropdown.value;
-                if (!grp) { alert('يجب عليك اختيار مجموعة أولاً!'); return; }
-                if (name) {
-                    if (!suggestedFeatures[grp]) suggestedFeatures[grp] = [];
-                    suggestedFeatures[grp].push({ name, type });
-                    saveData(); renderUI(); suggestionNameInput.value = '';
-                }
-            });
-
-            featuresContainer.addEventListener('click', (e) => {
-                const target = e.target.closest('button');
-                if (!target) return;
-
-                if (target.classList.contains('delete-feature-btn')) {
-                    const groupName = target.dataset.group;
-                    const index = parseInt(target.dataset.index, 10);
-                    if (confirm(`هل أنت متأكد من حذف هذه الميزة؟`)) {
-                        featureGroups[groupName].splice(index, 1);
-                        saveData();
-                        renderUI();
-                    }
-                    if (target.classList.contains('edit-feature-btn')) {
-                        const groupName = target.dataset.group;
-                        const index = parseInt(target.dataset.index, 10);
-                        const feature = featureGroups[groupName][index];
-                        const newName = prompt(`تعديل اسم الميزة:`, feature.name);
-                        if (newName !== null && newName.trim()) {
-                            feature.name = newName.trim();
-                            saveData();
-                            renderUI();
-                        }
-                    }
-                }
-                if (target.classList.contains('move-feature-btn')) {
-                    const oldGroup = target.dataset.group;
-                    const index = parseInt(target.dataset.index, 10);
-                    moveContext = { type: 'feature', oldGroup, index };
-                    // Populate modal select with groups (disable current)
-                    modalSelect.innerHTML = '';
-                    Object.keys(featureGroups).forEach(name => {
-                        const o = document.createElement('option');
-                        o.value = name;
-                        o.textContent = name;
-                        if (name === oldGroup) o.disabled = true;
-                        modalSelect.appendChild(o);
+        /**
+         * دالة لرسم بطاقات الاقتراحات
+         */
+        function renderSuggestionCards() {
+            suggestionsContainer.innerHTML = '';
+            if (Object.keys(suggestedFeatures).length === 0) {
+                suggestionsContainer.innerHTML = `
+                    <div class="text-center bg-white p-10 rounded-2xl shadow-md">
+                        <h3 class="text-xl font-semibold text-slate-700">لم تقم بإضافة أي اقتراحات بعد</h3>
+                    </div>`;
+                return;
+            }
+            for (const grp in suggestedFeatures) {
+                const arr = suggestedFeatures[grp];
+                const el = document.createElement('div'); el.className = 'bg-white p-6 rounded-2xl shadow-lg';
+                el.innerHTML = `
+                    <div class="flex justify-between items-center mb-4 border-b pb-3">
+                        <h3 class="text-xl font-bold text-slate-800">${grp} - اقتراحات</h3>
+                    </div>`;
+                const list = document.createElement('div'); list.className = 'space-y-3';
+                if (arr.length > 0) {
+                    arr.forEach((s, index) => {
+                        const color = s.type === 'necessary' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800';
+                        const text = s.type === 'necessary' ? 'ضرورية' : 'مستقبلية';
+                        const item = document.createElement('div');
+                        item.className = `flex items-center justify-between p-3 rounded-lg ${color}`;
+                        item.innerHTML = `
+                            <p class="font-medium text-slate-700">${s.name}</p>
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-semibold ${s.type==='necessary'?'text-red-800':'text-gray-800'} px-2 py-1 rounded-full">${text}</span>
+                                <button class="move-suggestion-btn text-slate-400 hover:text-blue-600 transition" data-group="${grp}" data-index="${index}" title="نقل الاقتراح">↔</button>
+                                <button class="edit-suggestion-btn text-slate-400 hover:text-yellow-600 transition" data-group="${grp}" data-index="${index}" title="تعديل الاقتراح">✎</button>
+                            </div>
+                        `;
+                        list.appendChild(item);
                     });
-                    modalSelect.value = oldGroup;
-                    // Show modal
-                    modal.classList.remove('hidden');
+                } else {
+                    list.innerHTML = `<p class="text-slate-500 text-center p-4">لا توجد اقتراحات في هذه المجموعة بعد.</p>`;
                 }
+                el.appendChild(list);
+                suggestionsContainer.appendChild(el);
+            }
+        }
 
-                if (target.classList.contains('delete-group-btn')) {
-                    const groupName = target.dataset.group;
-                    if (confirm(`هل أنت متأكد من حذف مجموعة "${groupName}" وكل الميزات بداخلها؟`)) {
-                        delete featureGroups[groupName];
-                        saveData();
-                        renderUI();
+        // Add function to render feature status counts
+        function renderFeatureCounts() {
+            const counts = { 'excellent': 0, 'good': 0, 'bad': 0, 'not-working': 0 };
+            for (const group of Object.values(featureGroups)) {
+                group.forEach(f => {
+                    if (counts.hasOwnProperty(f.status)) {
+                        counts[f.status]++;
                     }
-                }
-            });
+                });
+            }
+            const countsContainer = document.getElementById('feature-counts');
+            countsContainer.innerHTML = Object.entries(counts).map(([status, count]) => {
+                const cfg = statusConfig[status];
+                return `<div class="flex items-center gap-2"><span class="status-dot ${cfg.color}"></span><span class="font-medium text-slate-700">${cfg.text}: ${count}</span></div>`;
+            }).join('');
+        }
 
-            // Initial rendering is handled after IndexedDB load
+        // Add function to render total suggestion count
+        function renderSuggestionCounts() {
+            let totalSuggestions = 0;
+            Object.values(suggestedFeatures).forEach(arr => { totalSuggestions += arr.length; });
+            const suggContainer = document.getElementById('suggestion-counts');
+            suggContainer.innerHTML = `<div class="font-medium text-slate-700">الاقتراحات: ${totalSuggestions}</div>`;
+        }
 
-            // التعامل مع نقل المقترحات عبر المودال
-            suggestionsContainer.addEventListener('click', (e) => {
-                const target = e.target.closest('button');
-                if (!target) return;
-                if (target.classList.contains('move-suggestion-btn')) {
-                    const oldGroup = target.dataset.group;
-                    const index = parseInt(target.dataset.index, 10);
-                    moveContext = { type: 'suggestion', oldGroup, index };
-                    // تعبئة المودال
-                    modalSelect.innerHTML = '';
-                    Object.keys(featureGroups).forEach(name => {
-                        const o = document.createElement('option');
-                        o.value = name;
-                        o.textContent = name;
-                        if (name === oldGroup) o.disabled = true;
-                        modalSelect.appendChild(o);
-                    });
-                    modalSelect.value = oldGroup;
-                    modal.classList.remove('hidden');
-                }
-                if (target.classList.contains('edit-suggestion-btn')) {
-                    const oldGroup = target.dataset.group;
-                    const index = parseInt(target.dataset.index, 10);
-                    const suggestion = suggestedFeatures[oldGroup][index];
-                    const newName = prompt(`تعديل اسم الاقتراح:`, suggestion.name);
-                    if (newName !== null && newName.trim()) {
-                        suggestion.name = newName.trim();
-                        saveData();
-                        renderUI();
-                    }
-                }
-            });
-
-            // أزرار التحكم في المودال
-            modalCancel.addEventListener('click', () => {
-                modal.classList.add('hidden');
-                moveContext = null;
-            });
-            modalOk.addEventListener('click', () => {
-                const newGroup = modalSelect.value;
-                if (moveContext) {
-                    const { type, oldGroup, index } = moveContext;
-                    if (type === 'feature') {
-                        const item = featureGroups[oldGroup][index];
-                        if (featureGroups[newGroup]) {
-                            featureGroups[oldGroup].splice(index, 1);
-                            featureGroups[newGroup].push(item);
-                        }
-                    } else if (type === 'suggestion') {
-                        const item = suggestedFeatures[oldGroup][index];
-                        if (!suggestedFeatures[newGroup]) suggestedFeatures[newGroup] = [];
-                        suggestedFeatures[oldGroup].splice(index, 1);
-                        suggestedFeatures[newGroup].push(item);
-                    }
-                    saveData();
-                    renderUI();
-                }
-                modal.classList.add('hidden');
-                moveContext = null;
-            });
+        /**
+         * دالة رئيسية لإعادة رسم الواجهة بالكامل
+         */
+        function renderUI() {
+            // Render counts at top
+            renderFeatureCounts();
+            renderSuggestionCounts();
+            renderGroupSelector();
+            renderSuggestionGroupSelector();
+            renderFeatureCards();
+            renderSuggestionCards();
+        }
+        
+        addGroupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newGroupName = groupNameInput.value.trim();
+            if (newGroupName && !featureGroups[newGroupName]) {
+                featureGroups[newGroupName] = [];
+                saveData();
+                renderUI();
+                // تحديد المجموعة الجديدة في القائمة المنسدلة
+                selectGroupDropdown.value = newGroupName;
+                groupNameInput.value = '';
+            } else if (featureGroups[newGroupName]) {
+                alert('هذه المجموعة موجودة بالفعل!');
+            }
         });
+
+        addFeatureForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const featureName = featureNameInput.value.trim();
+            const featureStatus = featureStatusSelect.value;
+            const targetGroup = selectGroupDropdown.value;
+            
+            if (!targetGroup) {
+                alert('يجب عليك اختيار مجموعة أولاً!');
+                return;
+            }
+            
+            if (featureName) {
+                featureGroups[targetGroup].push({ name: featureName, status: featureStatus });
+                saveData();
+                renderUI();
+                featureNameInput.value = '';
+            }
+        });
+
+        // حدث إرسال نموذج الاقتراح
+        addSuggestionForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const name = suggestionNameInput.value.trim();
+            const type = suggestionTypeSelect.value;
+            const grp = selectSuggestionGroupDropdown.value;
+            if (!grp) { alert('يجب عليك اختيار مجموعة أولاً!'); return; }
+            if (name) {
+                if (!suggestedFeatures[grp]) suggestedFeatures[grp] = [];
+                suggestedFeatures[grp].push({ name, type });
+                saveData(); renderUI(); suggestionNameInput.value = '';
+            }
+        });
+
+        featuresContainer.addEventListener('click', (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
+
+            if (target.classList.contains('delete-feature-btn')) {
+                const groupName = target.dataset.group;
+                const index = parseInt(target.dataset.index, 10);
+                if (confirm(`هل أنت متأكد من حذف هذه الميزة؟`)) {
+                    featureGroups[groupName].splice(index, 1);
+                    saveData();
+                    renderUI();
+                }
+            }
+            if (target.classList.contains('edit-feature-btn')) {
+                const groupName = target.dataset.group;
+                const index = parseInt(target.dataset.index, 10);
+                const feature = featureGroups[groupName][index];
+                editContext = { type: 'feature', groupName, index, originalName: feature.name, originalStatus: feature.status };
+                editModalTitle.textContent = 'تعديل الميزة';
+                editModalNameInput.value = feature.name;
+                editModalTypeLabel.textContent = 'الحالة';
+                editModalTypeSelect.innerHTML = `
+                    <option value="excellent">ممتاز</option>
+                    <option value="good">جيد</option>
+                    <option value="bad">سيء</option>
+                    <option value="not-working">لا تعمل</option>
+                `;
+                editModalTypeSelect.value = feature.status;
+                editModal.classList.remove('hidden');
+            }
+            if (target.classList.contains('move-feature-btn')) {
+                const oldGroup = target.dataset.group;
+                const index = parseInt(target.dataset.index, 10);
+                moveContext = { type: 'feature', oldGroup, index };
+                // Populate modal select with groups (disable current)
+                modalSelect.innerHTML = '';
+                Object.keys(featureGroups).forEach(name => {
+                    const o = document.createElement('option');
+                    o.value = name;
+                    o.textContent = name;
+                    if (name === oldGroup) o.disabled = true;
+                    modalSelect.appendChild(o);
+                });
+                modalSelect.value = oldGroup;
+                // Show modal
+                modal.classList.remove('hidden');
+            }
+
+            if (target.classList.contains('delete-group-btn')) {
+                const groupName = target.dataset.group;
+                if (confirm(`هل أنت متأكد من حذف مجموعة "${groupName}" وكل الميزات بداخلها؟`)) {
+                    delete featureGroups[groupName];
+                    saveData();
+                    renderUI();
+                }
+            }
+        });
+
+        // Initial rendering is handled after IndexedDB load
 
         // التعامل مع نقل المقترحات عبر المودال
         suggestionsContainer.addEventListener('click', (e) => {
@@ -617,6 +590,21 @@
                 modalSelect.value = oldGroup;
                 modal.classList.remove('hidden');
             }
+            if (target.classList.contains('edit-suggestion-btn')) {
+                const oldGroup = target.dataset.group;
+                const index = parseInt(target.dataset.index, 10);
+                const suggestion = suggestedFeatures[oldGroup][index];
+                editContext = { type: 'suggestion', groupName: oldGroup, index, originalName: suggestion.name, originalType: suggestion.type };
+                editModalTitle.textContent = 'تعديل الاقتراح';
+                editModalNameInput.value = suggestion.name;
+                editModalTypeLabel.textContent = 'النوع';
+                editModalTypeSelect.innerHTML = `
+                    <option value="necessary">ضرورية</option>
+                    <option value="future">مستقبلية</option>
+                `;
+                editModalTypeSelect.value = suggestion.type;
+                editModal.classList.remove('hidden');
+            }
         });
 
         // أزرار التحكم في المودال
@@ -624,7 +612,6 @@
             modal.classList.add('hidden');
             moveContext = null;
         });
-
         modalOk.addEventListener('click', () => {
             const newGroup = modalSelect.value;
             if (moveContext) {
@@ -646,6 +633,36 @@
             }
             modal.classList.add('hidden');
             moveContext = null;
+        });
+
+        // أزرار التحكم في مودال التعديل
+        editModalCancelBtn.addEventListener('click', () => {
+            editModal.classList.add('hidden');
+            editContext = null;
+        });
+
+        editModalOkBtn.addEventListener('click', () => {
+            if (editContext) {
+                const newName = editModalNameInput.value.trim();
+                const newTypeOrStatus = editModalTypeSelect.value;
+
+                if (!newName) {
+                    alert('الاسم لا يمكن أن يكون فارغاً!');
+                    return;
+                }
+
+                if (editContext.type === 'feature') {
+                    featureGroups[editContext.groupName][editContext.index].name = newName;
+                    featureGroups[editContext.groupName][editContext.index].status = newTypeOrStatus;
+                } else if (editContext.type === 'suggestion') {
+                    suggestedFeatures[editContext.groupName][editContext.index].name = newName;
+                    suggestedFeatures[editContext.groupName][editContext.index].type = newTypeOrStatus;
+                }
+                saveData();
+                renderUI();
+            }
+            editModal.classList.add('hidden');
+            editContext = null;
         });
     </script>
 </body>
