@@ -412,6 +412,12 @@
                                 <span class="text-sm font-semibold ${s.type==='necessary'?'text-red-800':'text-gray-800'} px-2 py-1 rounded-full">${text}</span>
                                 <button class="move-suggestion-btn text-slate-400 hover:text-blue-600 transition" data-group="${grp}" data-index="${index}" title="نقل الاقتراح">↔</button>
                                 <button class="edit-suggestion-btn text-slate-400 hover:text-yellow-600 transition" data-group="${grp}" data-index="${index}" title="تعديل الاقتراح">✎</button>
+                                <!-- إضافة زر حذف الاقتراح -->
+                                <button class="delete-suggestion-btn text-slate-400 hover:text-red-600 transition" data-group="${grp}" data-index="${index}" title="حذف الاقتراح">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </button>
                             </div>
                         `;
                         list.appendChild(item);
@@ -604,6 +610,16 @@
                 `;
                 editModalTypeSelect.value = suggestion.type;
                 editModal.classList.remove('hidden');
+            }
+            // إضافة زر حذف الاقتراح
+            if (target.classList.contains('delete-suggestion-btn')) {
+                const group = target.dataset.group;
+                const index = parseInt(target.dataset.index, 10);
+                if (confirm('هل أنت متأكد من حذف هذا الاقتراح؟')) {
+                    suggestedFeatures[group].splice(index, 1);
+                    saveData();
+                    renderUI();
+                }
             }
         });
 
