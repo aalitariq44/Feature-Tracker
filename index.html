@@ -51,6 +51,10 @@
             <div id="suggestion-counts" class="flex justify-center gap-4 mb-4"></div>
             <div id="problem-counts" class="flex justify-center gap-4 mb-4"></div>
         </header>
+        <!-- حقل بحث موحد للميزات والاقتراحات والمشاكل -->
+        <div class="mb-6">
+            <input type="text" id="search-input" placeholder="بحث في الميزات والاقتراحات والمشاكل..." class="w-full bg-white border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" />
+        </div>
 
         <!-- منطقة الإدخال -->
         <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
@@ -258,6 +262,14 @@
     const addProblemBtn = document.getElementById('add-problem-btn');
     const problemsContainer = document.getElementById('problems-container');
 
+        // unified search setup
+        const searchInput = document.getElementById('search-input');
+        let searchTerm = '';
+        searchInput.addEventListener('input', () => {
+            searchTerm = searchInput.value.trim().toLowerCase();
+            renderUI();
+        });
+
         // عناصر المودال لاختيار المجموعة عند النقل
         const modal = document.getElementById('group-select-modal');
         const modalSelect = document.getElementById('group-select-modal-select');
@@ -457,6 +469,20 @@
          */
         function renderProblemCards() {
             problemsContainer.innerHTML = '';
+            // عرض نتائج البحث للمشاكل
+            if (searchTerm) {
+                let totalMatches = 0;
+                Object.values(problems).forEach(arr => {
+                    totalMatches += arr.filter(p => p.name.toLowerCase().includes(searchTerm)).length;
+                });
+                if (totalMatches === 0) {
+                    problemsContainer.innerHTML = `
+                        <div class="text-center bg-white p-10 rounded-2xl shadow-md">
+                            <h3 class="text-xl font-semibold text-slate-700">لا توجد نتائج بحث</h3>
+                        </div>`;
+                    return;
+                }
+            }
             if (Object.keys(problems).length === 0) {
                 problemsContainer.innerHTML = `
                     <div class="text-center bg-white p-10 rounded-2xl shadow-md">
@@ -466,14 +492,19 @@
             }
             for (const grp in problems) {
                 const arr = problems[grp];
+                // filter based on search term
+                const items = searchTerm
+                    ? arr.filter(p => p.name.toLowerCase().includes(searchTerm))
+                    : arr;
+                if (items.length === 0) continue;
                 const el = document.createElement('div'); el.className = 'bg-white p-6 rounded-2xl shadow-lg';
                 el.innerHTML = `
                     <div class="flex justify-between items-center mb-4 border-b pb-3">
                         <h3 class="text-xl font-bold text-slate-800">${grp} - مشاكل</h3>
                     </div>`;
                 const list = document.createElement('div'); list.className = 'space-y-3';
-                if (arr.length > 0) {
-                    arr.forEach((p, index) => {
+                if (items.length > 0) {
+                    items.forEach((p, index) => {
                         // Determine colors and label based on type
                         const bg = p.type === 'must' ? 'bg-red-100' : 'bg-gray-100';
                         const txt = p.type === 'must' ? 'text-red-800' : 'text-gray-800';
@@ -508,6 +539,20 @@
          */
         function renderFeatureCards() {
             featuresContainer.innerHTML = '';
+            // عرض نتائج البحث للميزات
+            if (searchTerm) {
+                let totalMatches = 0;
+                Object.values(featureGroups).forEach(arr => {
+                    totalMatches += arr.filter(f => f.name.toLowerCase().includes(searchTerm)).length;
+                });
+                if (totalMatches === 0) {
+                    featuresContainer.innerHTML = `
+                        <div class="text-center bg-white p-10 rounded-2xl shadow-md">
+                            <h3 class="text-xl font-semibold text-slate-700">لا توجد نتائج بحث</h3>
+                        </div>`;
+                    return;
+                }
+            }
 
             if (Object.keys(featureGroups).length === 0) {
                 featuresContainer.innerHTML = `
@@ -521,7 +566,10 @@
 
             
             for (const groupName in featureGroups) {
-                const group = featureGroups[groupName];
+                const group = searchTerm
+                    ? featureGroups[groupName].filter(f => f.name.toLowerCase().includes(searchTerm))
+                    : featureGroups[groupName];
+                if (group.length === 0) continue;
                 const groupElement = document.createElement('div');
                 groupElement.className = 'bg-white p-6 rounded-2xl shadow-lg';
 
@@ -574,6 +622,20 @@
          */
         function renderSuggestionCards() {
             suggestionsContainer.innerHTML = '';
+            // عرض نتائج البحث للاقتراحات
+            if (searchTerm) {
+                let totalMatches = 0;
+                Object.values(suggestedFeatures).forEach(arr => {
+                    totalMatches += arr.filter(s => s.name.toLowerCase().includes(searchTerm)).length;
+                });
+                if (totalMatches === 0) {
+                    suggestionsContainer.innerHTML = `
+                        <div class="text-center bg-white p-10 rounded-2xl shadow-md">
+                            <h3 class="text-xl font-semibold text-slate-700">لا توجد نتائج بحث</h3>
+                        </div>`;
+                    return;
+                }
+            }
             if (Object.keys(suggestedFeatures).length === 0) {
                 suggestionsContainer.innerHTML = `
                     <div class="text-center bg-white p-10 rounded-2xl shadow-md">
@@ -583,15 +645,19 @@
             }
             for (const grp in suggestedFeatures) {
                 const arr = suggestedFeatures[grp];
+                const items = searchTerm
+                    ? arr.filter(s => s.name.toLowerCase().includes(searchTerm))
+                    : arr;
+                if (items.length === 0) continue;
                 const el = document.createElement('div'); el.className = 'bg-white p-6 rounded-2xl shadow-lg';
                 el.innerHTML = `
                     <div class="flex justify-between items-center mb-4 border-b pb-3">
                         <h3 class="text-xl font-bold text-slate-800">${grp} - اقتراحات</h3>
                     </div>`;
                 const list = document.createElement('div'); list.className = 'space-y-3';
-                if (arr.length > 0) {
-                    arr.forEach((s, index) => {
-                        const color = s.type === 'necessary' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800';
+                if (items.length > 0) {
+                    items.forEach((s, index) => {
+                        const color = s.type === 'necessary' ? 'bg-purple-100 text-purple-800' : 'bg-indigo-100 text-indigo-800';
                         const text = s.type === 'necessary' ? 'ضرورية' : 'مستقبلية';
                         const item = document.createElement('div');
                         item.className = `flex items-center justify-between p-3 rounded-lg ${color}`;
