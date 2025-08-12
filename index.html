@@ -49,15 +49,25 @@
             <p class="text-slate-600 mt-2">أداة بسيطة لتنظيم وتتبع حالة ميزات تطبيقاتك.</p>
             <div id="feature-counts" class="flex justify-center gap-4 mb-4"></div>
             <div id="suggestion-counts" class="flex justify-center gap-4 mb-4"></div>
+            <div id="problem-counts" class="flex justify-center gap-4 mb-4"></div>
         </header>
 
         <!-- منطقة الإدخال -->
         <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
             <h2 class="text-2xl font-semibold mb-4 border-b pb-3 text-slate-800">إضافة جديد</h2>
-            
+            <!-- نموذج إنشاء مجموعة (مرفوع للأعلى) -->
+            <form id="add-group-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end mb-8">
+                <div class="md:col-span-4">
+                    <label for="group-name" class="block text-sm font-medium text-slate-700 mb-1">اسم مجموعة جديد</label>
+                    <input type="text" id="group-name" placeholder="مثال: ميزات لوحة التحكم" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition">
+                </div>
+                <button type="submit" class="md:col-span-2 w-full bg-sky-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition duration-300">
+                    إنشاء مجموعة
+                </button>
+            </form>
             <!-- نموذج إضافة الميزات -->
-            <form id="add-feature-form" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-                <div class="md:col-span-2">
+            <form id="add-feature-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end mb-8">
+                <div class="md:col-span-3">
                     <label for="feature-name" class="block text-sm font-medium text-slate-700 mb-1">اسم الميزة</label>
                     <input type="text" id="feature-name" placeholder="مثال: تسجيل الدخول بالبريد" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
                 </div>
@@ -74,42 +84,53 @@
                         <option value="not-working">لا تعمل</option>
                     </select>
                 </div>
-                <button type="submit" id="add-feature-btn" class="w-full bg-indigo-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300">
+                <button type="submit" id="add-feature-btn" class="md:col-span-1 w-full bg-indigo-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300">
                     إضافة ميزة
                 </button>
             </form>
 
             <div class="border-t my-6"></div>
 
-            <!-- نموذج إضافة مجموعة -->
-            <form id="add-group-form" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-                 <div class="md:col-span-4">
-                    <label for="group-name" class="block text-sm font-medium text-slate-700 mb-1">اسم مجموعة جديد</label>
-                    <input type="text" id="group-name" placeholder="مثال: ميزات لوحة التحكم" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition">
-                </div>
-                <button type="submit" class="w-full bg-sky-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition duration-300">
-                    إنشاء مجموعة
-                </button>
-            </form>
             <!-- نموذج إضافة اقتراح -->
-            <form id="add-suggestion-form" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end mb-8">
-                <div class="md:col-span-2">
+            <form id="add-suggestion-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end mb-8">
+                <div class="md:col-span-3">
                     <label for="suggestion-name" class="block text-sm font-medium text-slate-700 mb-1">اسم الاقتراح</label>
                     <input type="text" id="suggestion-name" placeholder="مثال: دعم الوضع الليلي" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
                 </div>
-                <div>
+                <div class="md:col-span-1">
                     <label for="select-suggestion-group" class="block text-sm font-medium text-slate-700 mb-1">اختر مجموعة</label>
                     <select id="select-suggestion-group" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"></select>
                 </div>
-                <div>
+                <div class="md:col-span-1">
                     <label for="suggestion-type" class="block text-sm font-medium text-slate-700 mb-1">نوع الاقتراح</label>
                     <select id="suggestion-type" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
                         <option value="necessary">ضرورية</option>
                         <option value="future">مستقبلية</option>
                     </select>
                 </div>
-                <button type="submit" id="add-suggestion-btn" class="w-full bg-purple-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-300">
+                <button type="submit" id="add-suggestion-btn" class="md:col-span-1 w-full bg-purple-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition duration-300">
                     إضافة اقتراح
+                </button>
+            </form>
+            <!-- نموذج إضافة مشاكل -->
+            <form id="add-problem-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end mb-8">
+                <div class="md:col-span-3">
+                    <label for="problem-name" class="block text-sm font-medium text-slate-700 mb-1">اسم المشكلة</label>
+                    <input type="text" id="problem-name" placeholder="مثال: خطأ في العرض" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                </div>
+                <div class="md:col-span-1">
+                    <label for="select-problem-group" class="block text-sm font-medium text-slate-700 mb-1">اختر مجموعة</label>
+                    <select id="select-problem-group" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"></select>
+                </div>
+                <div class="md:col-span-1">
+                    <label for="problem-type" class="block text-sm font-medium text-slate-700 mb-1">نوع المشكلة</label>
+                    <select id="problem-type" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                        <option value="must">يجب حلها</option>
+                        <option value="future">مستقبلية</option>
+                    </select>
+                </div>
+                <button type="submit" id="add-problem-btn" class="md:col-span-1 w-full bg-red-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition duration-300">
+                    إضافة مشكلة
                 </button>
             </form>
         </div>
@@ -122,6 +143,9 @@
         <div id="suggestions-container" class="space-y-6">
             <!-- سيتم إدراج الاقتراحات هنا بواسطة جافاسكريبت -->
         </div>
+            <!-- منطقة عرض المشاكل -->
+            <div id="problems-container" class="space-y-6">
+                <!-- سيتم إدراج المشاكل هنا بواسطة جافاسكريبت -->
         </div>
         <!-- Modal لاختيار المجموعة عند النقل -->
         <div id="group-select-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
@@ -187,6 +211,20 @@
               </div>
               <button type="submit" class="w-full bg-purple-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-purple-700">إضافة</button>
             </form>
+            <div class="border-t my-4"></div>
+            <h4 class="text-lg font-semibold mb-2">إضافة مشكلة جديدة</h4>
+            <form id="group-view-add-problem-form" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end mb-4">
+              <div class="md:col-span-3">
+                <input id="group-view-problem-name" type="text" placeholder="اسم المشكلة" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5" />
+              </div>
+              <div>
+                <select id="group-view-problem-type" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5">
+                  <option value="must">يجب حلها</option>
+                  <option value="future">مستقبلية</option>
+                </select>
+              </div>
+              <button type="submit" class="w-full bg-red-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-red-700">إضافة</button>
+            </form>
             <div class="flex justify-end mt-4">
               <button id="group-view-modal-close" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">إغلاق</button>
             </div>
@@ -206,12 +244,19 @@
         const groupNameInput = document.getElementById('group-name');
 
         // عناصر واجهة الاقتراحات
-        const addSuggestionForm = document.getElementById('add-suggestion-form');
+    const addSuggestionForm = document.getElementById('add-suggestion-form');
         const suggestionNameInput = document.getElementById('suggestion-name');
         const suggestionTypeSelect = document.getElementById('suggestion-type');
         const selectSuggestionGroupDropdown = document.getElementById('select-suggestion-group');
         const addSuggestionBtn = document.getElementById('add-suggestion-btn');
-        const suggestionsContainer = document.getElementById('suggestions-container');
+    const suggestionsContainer = document.getElementById('suggestions-container');
+    // عناصر واجهة المشاكل
+    const addProblemForm = document.getElementById('add-problem-form');
+    const problemNameInput = document.getElementById('problem-name');
+    const selectProblemGroupDropdown = document.getElementById('select-problem-group');
+    const problemTypeSelect = document.getElementById('problem-type');
+    const addProblemBtn = document.getElementById('add-problem-btn');
+    const problemsContainer = document.getElementById('problems-container');
 
         // عناصر المودال لاختيار المجموعة عند النقل
         const modal = document.getElementById('group-select-modal');
@@ -240,6 +285,9 @@
         const groupViewAddSuggestionForm = document.getElementById('group-view-add-suggestion-form');
         const groupViewSuggestionName = document.getElementById('group-view-suggestion-name');
         const groupViewSuggestionType = document.getElementById('group-view-suggestion-type');
+        const groupViewAddProblemForm = document.getElementById('group-view-add-problem-form');
+        const groupViewProblemName = document.getElementById('group-view-problem-name');
+        const groupViewProblemType = document.getElementById('group-view-problem-type');
         const groupViewClose = document.getElementById('group-view-modal-close');
         let currentModalGroup = null;
 
@@ -250,11 +298,13 @@
             'not-working': { text: 'لا تعمل', color: 'bg-red-500', textColor: 'text-red-800', bgColor: 'bg-red-100' }
         };
 
-        let featureGroups = {};
-        let suggestedFeatures = {};
+    let featureGroups = {};
+    let suggestedFeatures = {};
+    let problems = {};
 
-        let db;
-        const request = indexedDB.open('FeatureTrackerDB', 1);
+    let db;
+    // Open DB without specifying version to preserve existing IndexedDB data structure
+    const request = indexedDB.open('FeatureTrackerDB');
 
         request.onupgradeneeded = function(event) {
             db = event.target.result;
@@ -274,6 +324,7 @@
             console.error('IndexedDB error:', event.target.errorCode);
             featureGroups = {};
             suggestedFeatures = {};
+            problems = {};
             renderUI();
         };
 
@@ -284,19 +335,32 @@
                 const store = tx.objectStore('featureStore');
                 const getReq = store.get('featureTrackerData');
                 getReq.onsuccess = function() {
-                    const data = getReq.result || {};
-                    if (data.featureGroups) {
-                        featureGroups = data.featureGroups;
+                    const data = getReq.result;
+                    if (data) {
+                        // Normalize nested structures
+                        if (data.featureGroups) {
+                            let fg = data.featureGroups;
+                            // Unwrap double nesting if present
+                            if (fg.featureGroups) fg = fg.featureGroups;
+                            featureGroups = fg;
+                        } else if (typeof data === 'object') {
+                            featureGroups = data;
+                        } else {
+                            featureGroups = {};
+                        }
                         suggestedFeatures = data.suggestedFeatures || {};
+                        problems = data.problems || {};
                     } else {
-                        featureGroups = data;
+                        featureGroups = {};
                         suggestedFeatures = {};
+                        problems = {};
                     }
                     resolve();
                 };
                 getReq.onerror = function() {
                     featureGroups = {};
                     suggestedFeatures = {};
+                    problems = {};
                     resolve();
                 };
             });
@@ -306,7 +370,7 @@
         function saveData() {
             const tx = db.transaction('featureStore', 'readwrite');
             const store = tx.objectStore('featureStore');
-            store.put({ featureGroups, suggestedFeatures }, 'featureTrackerData');
+            store.put({ featureGroups, suggestedFeatures, problems }, 'featureTrackerData');
         }
 
         /**
@@ -367,6 +431,77 @@
                 if (keys.includes(last)) selectSuggestionGroupDropdown.value = last;
             }
         }
+        // Global selector renderer for problems
+        function renderProblemGroupSelector() {
+            if (!selectProblemGroupDropdown) return;
+            const last = selectProblemGroupDropdown.value || '';
+            selectProblemGroupDropdown.innerHTML = '';
+            const keys = Object.keys(featureGroups);
+            if (keys.length === 0) {
+                selectProblemGroupDropdown.disabled = true;
+                problemNameInput.disabled = true;
+                addProblemBtn.disabled = true;
+                const opt = document.createElement('option'); opt.textContent = 'أنشئ مجموعة أولاً';
+                selectProblemGroupDropdown.appendChild(opt);
+            } else {
+                selectProblemGroupDropdown.disabled = false;
+                problemNameInput.disabled = false;
+                addProblemBtn.disabled = false;
+                keys.forEach(name => { const o = document.createElement('option'); o.value = name; o.textContent = name; selectProblemGroupDropdown.appendChild(o); });
+                if (keys.includes(last)) selectProblemGroupDropdown.value = last;
+            }
+        }
+
+        /**
+         * دالة لرسم بطاقات المشاكل
+         */
+        function renderProblemCards() {
+            problemsContainer.innerHTML = '';
+            if (Object.keys(problems).length === 0) {
+                problemsContainer.innerHTML = `
+                    <div class="text-center bg-white p-10 rounded-2xl shadow-md">
+                        <h3 class="text-xl font-semibold text-slate-700">لم تقم بإضافة أي مشاكل بعد</h3>
+                    </div>`;
+                return;
+            }
+            for (const grp in problems) {
+                const arr = problems[grp];
+                const el = document.createElement('div'); el.className = 'bg-white p-6 rounded-2xl shadow-lg';
+                el.innerHTML = `
+                    <div class="flex justify-between items-center mb-4 border-b pb-3">
+                        <h3 class="text-xl font-bold text-slate-800">${grp} - مشاكل</h3>
+                    </div>`;
+                const list = document.createElement('div'); list.className = 'space-y-3';
+                if (arr.length > 0) {
+                    arr.forEach((p, index) => {
+                        // Determine colors and label based on type
+                        const bg = p.type === 'must' ? 'bg-red-100' : 'bg-gray-100';
+                        const txt = p.type === 'must' ? 'text-red-800' : 'text-gray-800';
+                        const label = p.type === 'must' ? 'يجب حلها' : 'مستقبلية';
+                        const item = document.createElement('div');
+                        item.className = `flex items-center justify-between p-3 rounded-lg ${bg}`;
+                        item.innerHTML = `
+                            <p class="font-medium text-slate-700">${p.name}</p>
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-semibold ${txt} px-2 py-1 rounded-full">${label}</span>
+                                <button class="move-problem-btn text-slate-400 hover:text-blue-600 transition" data-group="${grp}" data-index="${index}" title="نقل المشكلة">↔</button>
+                                <button class="edit-problem-btn text-slate-400 hover:text-yellow-600 transition" data-group="${grp}" data-index="${index}" title="تعديل المشكلة">✎</button>
+                                <button class="delete-problem-btn text-slate-400 hover:text-red-600 transition" data-group="${grp}" data-index="${index}" title="حذف المشكلة">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </button>
+                            </div>
+                        `;
+                        list.appendChild(item);
+                    });
+                } else {
+                    list.innerHTML = `<p class="text-slate-500 text-center p-4">لا توجد مشاكل في هذه المجموعة بعد.</p>`;
+                }
+                el.appendChild(list);
+                problemsContainer.appendChild(el);
+            }
+        }
 
         /**
          * دالة لرسم بطاقات المجموعات والميزات
@@ -383,6 +518,7 @@
                 `;
                 return;
             }
+
             
             for (const groupName in featureGroups) {
                 const group = featureGroups[groupName];
@@ -393,7 +529,7 @@
                     <div class="flex justify-between items-center mb-4 border-b pb-3">
                         <h3 class="text-xl font-bold text-slate-800">${groupName}</h3>
                         <button class="delete-group-btn text-slate-400 hover:text-red-600 transition" data-group="${groupName}" title="حذف المجموعة">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         </button>
                     </div>
                 `;
@@ -508,6 +644,16 @@
             suggContainer.innerHTML = `<div class="font-medium text-slate-700">الاقتراحات: ${totalSuggestions}</div>`;
         }
 
+        // Add function to render total problem count
+        function renderProblemCounts() {
+            let totalProblems = 0;
+            Object.values(problems).forEach(arr => { totalProblems += arr.length; });
+            const probContainer = document.getElementById('problem-counts');
+            if (probContainer) { // Check if element exists before setting innerHTML
+                probContainer.innerHTML = `<div class="font-medium text-slate-700">المشاكل: ${totalProblems}</div>`;
+            }
+        }
+
         /**
          * دالة رئيسية لإعادة رسم الواجهة بالكامل
          */
@@ -515,10 +661,13 @@
             // Render counts at top
             renderFeatureCounts();
             renderSuggestionCounts();
+            renderProblemCounts();
             renderGroupSelector();
             renderSuggestionGroupSelector();
+            renderProblemGroupSelector();
             renderFeatureCards();
             renderSuggestionCards();
+            renderProblemCards();
         }
         
         addGroupForm.addEventListener('submit', (e) => {
@@ -566,6 +715,20 @@
                 if (!suggestedFeatures[grp]) suggestedFeatures[grp] = [];
                 suggestedFeatures[grp].push({ name, type });
                 saveData(); renderUI(); suggestionNameInput.value = '';
+            }
+        });
+    
+        // حدث إرسال نموذج المشاكل
+        addProblemForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const name = problemNameInput.value.trim();
+            const type = problemTypeSelect.value;
+            const grp = selectProblemGroupDropdown.value;
+            if (!grp) { alert('يجب عليك اختيار مجموعة أولاً!'); return; }
+            if (name) {
+                if (!problems[grp]) problems[grp] = [];
+                problems[grp].push({ name, type });
+                saveData(); renderUI(); problemNameInput.value = '';
             }
         });
 
@@ -676,6 +839,52 @@
             }
         });
 
+        // التعامل مع نقل المشاكل عبر المودال
+        problemsContainer.addEventListener('click', (e) => {
+            const target = e.target.closest('button');
+            if (!target) return;
+            if (target.classList.contains('move-problem-btn')) {
+                const oldGroup = target.dataset.group;
+                const index = parseInt(target.dataset.index, 10);
+                moveContext = { type: 'problem', oldGroup, index };
+                // تعبئة المودال
+                modalSelect.innerHTML = '';
+                Object.keys(featureGroups).forEach(name => {
+                    const o = document.createElement('option');
+                    o.value = name;
+                    o.textContent = name;
+                    if (name === oldGroup) o.disabled = true;
+                    modalSelect.appendChild(o);
+                });
+                modalSelect.value = oldGroup;
+                modal.classList.remove('hidden');
+            }
+            if (target.classList.contains('edit-problem-btn')) {
+                const oldGroup = target.dataset.group;
+                const index = parseInt(target.dataset.index, 10);
+                const problem = problems[oldGroup][index];
+                editContext = { type: 'problem', groupName: oldGroup, index, originalName: problem.name, originalType: problem.type };
+                editModalTitle.textContent = 'تعديل المشكلة';
+                editModalNameInput.value = problem.name;
+                editModalTypeLabel.textContent = 'النوع';
+                editModalTypeSelect.innerHTML = `
+                    <option value="must">يجب حلها</option>
+                    <option value="future">مستقبلية</option>
+                `;
+                editModalTypeSelect.value = problem.type;
+                editModal.classList.remove('hidden');
+            }
+            if (target.classList.contains('delete-problem-btn')) {
+                const group = target.dataset.group;
+                const index = parseInt(target.dataset.index, 10);
+                if (confirm('هل أنت متأكد من حذف هذه المشكلة؟')) {
+                    problems[group].splice(index, 1);
+                    saveData();
+                    renderUI();
+                }
+            }
+        });
+
         // أزرار التحكم في المودال
         modalCancel.addEventListener('click', () => {
             modal.classList.add('hidden');
@@ -696,6 +905,11 @@
                     if (!suggestedFeatures[newGroup]) suggestedFeatures[newGroup] = [];
                     suggestedFeatures[oldGroup].splice(index, 1);
                     suggestedFeatures[newGroup].push(item);
+                } else if (type === 'problem') {
+                    const item = problems[oldGroup][index];
+                    if (!problems[newGroup]) problems[newGroup] = [];
+                    problems[oldGroup].splice(index, 1);
+                    problems[newGroup].push(item);
                 }
                 saveData();
                 renderUI();
@@ -726,6 +940,9 @@
                 } else if (editContext.type === 'suggestion') {
                     suggestedFeatures[editContext.groupName][editContext.index].name = newName;
                     suggestedFeatures[editContext.groupName][editContext.index].type = newTypeOrStatus;
+                } else if (editContext.type === 'problem') {
+                    problems[editContext.groupName][editContext.index].name = newName;
+                    problems[editContext.groupName][editContext.index].type = newTypeOrStatus;
                 }
                 saveData();
                 renderUI();
@@ -765,6 +982,19 @@
             html += `<p class="text-slate-500 text-center p-4">لا توجد اقتراحات في هذه المجموعة بعد.</p>`;
           }
           html += '</div>';
+          // problems list
+          const probs = problems[groupName] || [];
+          html += '<div class="mt-4 space-y-3">';
+          if (probs.length) {
+            probs.forEach(p => {
+              const cls = p.type === 'must' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800';
+              html += `<div class="flex items-center justify-between p-3 rounded-lg ${cls}"><p class="font-medium text-slate-700">${p.name}</p>` +
+                      `<span class="text-sm font-semibold ${cls} px-2 py-1 rounded-full">${p.type==='must'?'يجب حلها':'مستقبلية'}</span></div>`;
+            });
+          } else {
+            html += `<p class="text-slate-500 text-center p-4">لا توجد مشاكل في هذه المجموعة بعد.</p>`;
+          }
+          html += '</div>';
           groupViewContent.innerHTML = html;
           // reset forms
           groupViewAddFeatureForm.reset();
@@ -802,6 +1032,17 @@
           if (!name) return alert('الاسم لا يمكن أن يكون فارغاً!');
           if (!suggestedFeatures[currentModalGroup]) suggestedFeatures[currentModalGroup] = [];
           suggestedFeatures[currentModalGroup].push({ name, type });
+          saveData(); renderUI(); openGroupModal(currentModalGroup);
+        });
+
+        // problem add in modal
+        groupViewAddProblemForm.addEventListener('submit', e => {
+          e.preventDefault();
+          const name = groupViewProblemName.value.trim();
+          const type = groupViewProblemType.value;
+          if (!name) return alert('الاسم لا يمكن أن يكون فارغاً!');
+          if (!problems[currentModalGroup]) problems[currentModalGroup] = [];
+          problems[currentModalGroup].push({ name, type });
           saveData(); renderUI(); openGroupModal(currentModalGroup);
         });
 
