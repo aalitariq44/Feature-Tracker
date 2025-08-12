@@ -152,8 +152,48 @@
             </div>
           </div>
         </div>
-    </div>
-
+        <!-- Modal لعرض المجموعة -->
+        <div id="group-view-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+          <div class="bg-white rounded-lg p-6 w-full max-w-2xl max-h-screen overflow-auto">
+            <h3 id="group-view-modal-title" class="text-xl font-bold mb-4"></h3>
+            <div id="group-view-modal-content" class="space-y-4"></div>
+            <div class="border-t my-4"></div>
+            <h4 class="text-lg font-semibold mb-2">إضافة ميزة جديدة</h4>
+            <form id="group-view-add-feature-form" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end mb-4">
+              <div class="md:col-span-3">
+                <input id="group-view-feature-name" type="text" placeholder="اسم الميزة" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5" />
+              </div>
+              <div>
+                <select id="group-view-feature-status" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5">
+                  <option value="excellent">ممتاز</option>
+                  <option value="good">جيد</option>
+                  <option value="bad">سيء</option>
+                  <option value="not-working">لا تعمل</option>
+                </select>
+              </div>
+              <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-indigo-700">إضافة</button>
+            </form>
+            <div class="border-t my-4"></div>
+            <h4 class="text-lg font-semibold mb-2">إضافة اقتراح جديد</h4>
+            <form id="group-view-add-suggestion-form" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end mb-4">
+              <div class="md:col-span-3">
+                <input id="group-view-suggestion-name" type="text" placeholder="اسم الاقتراح" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5" />
+              </div>
+              <div>
+                <select id="group-view-suggestion-type" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5">
+                  <option value="necessary">ضرورية</option>
+                  <option value="future">مستقبلية</option>
+                </select>
+              </div>
+              <button type="submit" class="w-full bg-purple-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-purple-700">إضافة</button>
+            </form>
+            <div class="flex justify-end mt-4">
+              <button id="group-view-modal-close" class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">إغلاق</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </body>
     <script>
         // عناصر واجهة الميزات
         const addFeatureForm = document.getElementById('add-feature-form');
@@ -189,6 +229,19 @@
         const editModalOkBtn = document.getElementById('edit-item-modal-ok');
         const editModalCancelBtn = document.getElementById('edit-item-modal-cancel');
         let editContext = null;
+
+        // عناصر مودال عرض المجموعة
+        const groupViewModal = document.getElementById('group-view-modal');
+        const groupViewTitle = document.getElementById('group-view-modal-title');
+        const groupViewContent = document.getElementById('group-view-modal-content');
+        const groupViewAddFeatureForm = document.getElementById('group-view-add-feature-form');
+        const groupViewFeatureName = document.getElementById('group-view-feature-name');
+        const groupViewFeatureStatus = document.getElementById('group-view-feature-status');
+        const groupViewAddSuggestionForm = document.getElementById('group-view-add-suggestion-form');
+        const groupViewSuggestionName = document.getElementById('group-view-suggestion-name');
+        const groupViewSuggestionType = document.getElementById('group-view-suggestion-type');
+        const groupViewClose = document.getElementById('group-view-modal-close');
+        let currentModalGroup = null;
 
         const statusConfig = {
             'excellent': { text: 'ممتاز', color: 'bg-green-500', textColor: 'text-green-800', bgColor: 'bg-green-100' },
@@ -680,6 +733,87 @@
             editModal.classList.add('hidden');
             editContext = null;
         });
+
+        function openGroupModal(groupName) {
+          currentModalGroup = groupName;
+          groupViewTitle.textContent = groupName;
+          let html = '';
+          // features list
+          const feats = featureGroups[groupName] || [];
+          html += '<div class="space-y-3">';
+          if (feats.length) {
+            feats.forEach(f => {
+              const cfg = statusConfig[f.status];
+              html += `<div class="flex items-center justify-between p-3 rounded-lg ${cfg.bgColor}">` +
+                      `<div class="flex items-center gap-3"><span class="status-dot ${cfg.color}"></span><p class="font-medium text-slate-700">${f.name}</p></div>` +
+                      `<span class="text-sm font-semibold ${cfg.textColor} px-2 py-1 rounded-full">${cfg.text}</span></div>`;
+            });
+          } else {
+            html += `<p class="text-slate-500 text-center p-4">لا توجد ميزات في هذه المجموعة بعد.</p>`;
+          }
+          html += '</div>';
+          // suggestions list
+          const sugs = suggestedFeatures[groupName] || [];
+          html += '<div class="mt-4 space-y-3">';
+          if (sugs.length) {
+            sugs.forEach(s => {
+              const cls = s.type === 'necessary' ? 'bg-purple-100 text-purple-800' : 'bg-indigo-100 text-indigo-800';
+              html += `<div class="flex items-center justify-between p-3 rounded-lg ${cls}"><p class="font-medium text-slate-700">${s.name}</p>` +
+                      `<span class="text-sm font-semibold ${cls} px-2 py-1 rounded-full">${s.type==='necessary'?'ضرورية':'مستقبلية'}</span></div>`;
+            });
+          } else {
+            html += `<p class="text-slate-500 text-center p-4">لا توجد اقتراحات في هذه المجموعة بعد.</p>`;
+          }
+          html += '</div>';
+          groupViewContent.innerHTML = html;
+          // reset forms
+          groupViewAddFeatureForm.reset();
+          groupViewAddSuggestionForm.reset();
+          groupViewModal.classList.remove('hidden');
+        }
+
+        // attach click to group headers
+        function enhanceGroupClicks() {
+          document.querySelectorAll('#features-container .bg-white.p-6.rounded-2xl.shadow-lg > .flex.border-b .text-xl').forEach(el => {
+            // fallback selector, better to use data attribute
+          });
+        }
+
+        // Close modal
+        groupViewClose.addEventListener('click', () => {
+          groupViewModal.classList.add('hidden');
+        });
+
+        // feature add in modal
+        groupViewAddFeatureForm.addEventListener('submit', e => {
+          e.preventDefault();
+          const name = groupViewFeatureName.value.trim();
+          const status = groupViewFeatureStatus.value;
+          if (!name) return alert('الاسم لا يمكن أن يكون فارغاً!');
+          featureGroups[currentModalGroup].push({ name, status });
+          saveData(); renderUI(); openGroupModal(currentModalGroup);
+        });
+
+        // suggestion add in modal
+        groupViewAddSuggestionForm.addEventListener('submit', e => {
+          e.preventDefault();
+          const name = groupViewSuggestionName.value.trim();
+          const type = groupViewSuggestionType.value;
+          if (!name) return alert('الاسم لا يمكن أن يكون فارغاً!');
+          if (!suggestedFeatures[currentModalGroup]) suggestedFeatures[currentModalGroup] = [];
+          suggestedFeatures[currentModalGroup].push({ name, type });
+          saveData(); renderUI(); openGroupModal(currentModalGroup);
+        });
+
+        // modify renderFeatureCards to attach click
+        const originalRender = renderFeatureCards;
+        renderFeatureCards = function() {
+          originalRender();
+          document.querySelectorAll('#features-container h3.text-xl').forEach(h3 => {
+            const grp = h3.textContent;
+            h3.style.cursor = 'pointer';
+            h3.addEventListener('click', () => openGroupModal(grp));
+          });
+        };
     </script>
-</body>
-</html>
+  </html>
